@@ -1,0 +1,361 @@
+<Window x:Class="Blasting_Layout.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:Blasting_Layout.Models"
+        xmlns:viewModels="clr-namespace:Blasting_Layout.ViewModels"
+        xmlns:views="clr-namespace:Blasting_Layout.Views"
+        Title="Mining Blast Design and Reporting System"
+        Width="1440"
+        Height="900"
+        MinWidth="1050"
+        MinHeight="650"
+        Background="#F3F6FA"
+        FontFamily="Segoe UI"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.DataContext>
+        <viewModels:MainViewModel />
+    </Window.DataContext>
+
+    <Window.Resources>
+        <DrawingBrush x:Key="GraphPaperBrush"
+                      TileMode="Tile"
+                      Viewport="0,0,100,100"
+                      ViewportUnits="Absolute"
+                      Viewbox="0,0,100,100"
+                      ViewboxUnits="Absolute"
+                      Stretch="None">
+            <DrawingBrush.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Geometry="M 25,0 L 25,100 M 50,0 L 50,100 M 75,0 L 75,100 M 0,25 L 100,25 M 0,50 L 100,50 M 0,75 L 100,75">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#E6EAF0" Thickness="0.8" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Geometry="M 0,0 L 0,100 M 0,0 L 100,0">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#CBD4E0" Thickness="1.2" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+
+        <Style x:Key="PanelHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#1F2A3D" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Margin" Value="0,4" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Background" Value="#F2F5F9" />
+            <Setter Property="Foreground" Value="#26354A" />
+            <Setter Property="BorderBrush" Value="#D7DFE9" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+        <views:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <DockPanel LastChildFill="True">
+        <Border DockPanel.Dock="Top" Background="#172438" Padding="22,14">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Margin="0,0,8,0" Padding="10,6"
+                            Content="{Binding ToolboxToggleText}"
+                            Command="{Binding ToggleToolboxCommand}"
+                            Background="#2A3A51" Foreground="White" BorderBrush="#53647A" />
+                    <Button Margin="0,0,18,0" Padding="10,6"
+                            Content="{Binding HolePropertiesToggleText}"
+                            Command="{Binding ToggleHolePropertiesCommand}"
+                            Background="#2A3A51" Foreground="White" BorderBrush="#53647A" />
+                    <TextBlock VerticalAlignment="Center" Foreground="#C3CEDD"
+                               Text="BLAST LAYOUT DESIGNER  |  PROTOTYPE" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock FontSize="20" FontWeight="SemiBold" Foreground="White"
+                               Text="Mining Blast Design and Reporting System" />
+                    <TextBlock Margin="0,3,0,0" FontSize="12" Foreground="#C3CEDD"
+                               Text="Manual blast-hole plotting board" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <StatusBar DockPanel.Dock="Bottom" Background="White" BorderBrush="#DCE3EC" BorderThickness="0,1,0,0">
+            <StatusBarItem>
+                <TextBlock>
+                    <Run FontWeight="SemiBold" Text="Total Holes: " />
+                    <Run Text="{Binding TotalHoles, Mode=OneWay}" />
+                </TextBlock>
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <TextBlock>
+                    <Run FontWeight="SemiBold" Text="Total Connectors: " />
+                    <Run Text="{Binding TotalConnectors, Mode=OneWay}" />
+                </TextBlock>
+            </StatusBarItem>
+            <Separator />
+            <StatusBarItem HorizontalContentAlignment="Stretch">
+                <TextBlock Text="{Binding StatusMessage}" Foreground="#526177" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <Border DockPanel.Dock="Left" Width="245" Margin="12,12,6,12" Padding="16"
+                Visibility="{Binding IsToolboxVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Background="White" BorderBrush="#DFE5ED" BorderThickness="1" CornerRadius="8">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Style="{StaticResource PanelHeaderStyle}" Text="Toolbox" />
+
+                    <TextBlock Margin="0,0,0,6" FontWeight="SemiBold" Foreground="#526177" Text="Pattern Type" />
+                    <RadioButton Margin="0,4" Content="Square Pattern" IsChecked="{Binding IsSquarePattern}" />
+                    <RadioButton Margin="0,4,0,12" Content="Staggered Pattern" IsChecked="{Binding IsStaggeredPattern}" />
+
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Foreground="#526177"
+                               Text="Staggered Offset Direction" />
+                    <ComboBox Height="34" Margin="0,0,0,12"
+                              ItemsSource="{Binding StaggerDirections}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Value"
+                              SelectedValue="{Binding SelectedStaggerDirection}" />
+
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Foreground="#526177"
+                               Text="Row Insertion Direction" />
+                    <ComboBox Height="34" Margin="0,0,0,12"
+                              ItemsSource="{Binding RowInsertionDirections}"
+                              DisplayMemberPath="Name"
+                              SelectedValuePath="Value"
+                              SelectedValue="{Binding SelectedRowInsertionDirection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Foreground="#526177" Text="Row Name" />
+                    <TextBox Height="34" Padding="8,5" Text="{Binding RowNameInput, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Leave blank to name rows A, B, C ... Z, AA, AB, and so on." />
+
+                    <TextBlock Margin="0,12,0,5" FontWeight="SemiBold" Foreground="#526177" Text="Hole Count" />
+                    <TextBox Height="34" Padding="8,5" Text="{Binding HoleCountInput, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <Button Margin="0,14,0,4" Height="40" Content="Add Row"
+                            Command="{Binding AddRowCommand}"
+                            Background="#2463D3" Foreground="White" BorderBrush="#2463D3"
+                            FontWeight="SemiBold" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="Delete Selected Hole(s)"
+                            Command="{Binding DeleteSelectedHoleCommand}" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="{Binding ConnectorButtonText}"
+                            Command="{Binding DrawConnectorCommand}" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="{Binding GridButtonText}"
+                            Command="{Binding ToggleGridCommand}" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="Delete Selected Segment(s)"
+                            Command="{Binding DeleteSelectedConnectionSegmentsCommand}" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="Delete Selected Chain"
+                            Command="{Binding DeleteSelectedConnectionChainCommand}" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="Clear Layout"
+                            Command="{Binding ClearLayoutCommand}" />
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="Undo (Ctrl+Z)"
+                            Command="{Binding UndoCommand}" />
+
+                    <Separator Margin="0,14" />
+                    <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Foreground="#526177"
+                               Text="Connector Color" />
+                    <ComboBox Height="34" Margin="0,0,0,12"
+                              ItemsSource="{Binding ConnectorColors}"
+                              SelectedValuePath="Hex"
+                              SelectedValue="{Binding SelectedConnectorColor}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Border Width="14" Height="14" Margin="0,0,8,0"
+                                            Background="{Binding Hex}" CornerRadius="7" />
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Style="{StaticResource PanelHeaderStyle}" Text="Canvas View" />
+                    <DockPanel>
+                        <Button Width="92" Height="36" Margin="0,0,8,0" Content="Zoom In"
+                                Command="{Binding ZoomInCommand}" />
+                        <Button Width="92" Height="36" Content="Zoom Out"
+                                Command="{Binding ZoomOutCommand}" />
+                    </DockPanel>
+                    <Button Style="{StaticResource ActionButtonStyle}" Content="Recenter Canvas"
+                            Click="RecenterCanvas_Click" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <Border DockPanel.Dock="Right" Width="270" Margin="6,12,12,12" Padding="16"
+                Visibility="{Binding IsHolePropertiesVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Background="White" BorderBrush="#DFE5ED" BorderThickness="1" CornerRadius="8">
+            <StackPanel>
+                <TextBlock Style="{StaticResource PanelHeaderStyle}" Text="Hole Properties" />
+                <TextBlock Margin="0,0,0,16" Foreground="#758297" TextWrapping="Wrap"
+                           Text="Select a hole on the canvas to view and edit its properties." />
+
+                <TextBlock Margin="0,0,0,5" FontWeight="SemiBold" Foreground="#526177" Text="Hole ID" />
+                <TextBox x:Name="HoleIdTextBox" Height="34" Padding="8,5" IsEnabled="{Binding HasSelectedHole}"
+                         GotKeyboardFocus="PropertyEditor_GotKeyboardFocus"
+                         LostKeyboardFocus="PropertyEditor_LostKeyboardFocus"
+                         Text="{Binding SelectedHoleId, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Margin="0,14,0,5" FontWeight="SemiBold" Foreground="#526177" Text="Depth" />
+                <TextBox Height="34" Padding="8,5" IsEnabled="{Binding HasSelectedHole}"
+                         GotKeyboardFocus="PropertyEditor_GotKeyboardFocus"
+                         LostKeyboardFocus="PropertyEditor_LostKeyboardFocus"
+                         Text="{Binding SelectedHole.Depth, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Margin="0,14,0,5" FontWeight="SemiBold" Foreground="#526177" Text="Burden" />
+                <TextBox Height="34" Padding="8,5" IsEnabled="{Binding HasSelectedHole}"
+                         GotKeyboardFocus="PropertyEditor_GotKeyboardFocus"
+                         LostKeyboardFocus="PropertyEditor_LostKeyboardFocus"
+                         Text="{Binding SelectedHole.Burden, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Margin="0,14,0,5" FontWeight="SemiBold" Foreground="#526177" Text="Spacing" />
+                <TextBox Height="34" Padding="8,5" IsEnabled="{Binding HasSelectedHole}"
+                         GotKeyboardFocus="PropertyEditor_GotKeyboardFocus"
+                         LostKeyboardFocus="PropertyEditor_LostKeyboardFocus"
+                         Text="{Binding SelectedHole.Spacing, UpdateSourceTrigger=PropertyChanged}" />
+
+                <Border Margin="0,22,0,0" Padding="10" Background="#F3F6FA" CornerRadius="5">
+                    <TextBlock FontSize="12" Foreground="#718096" TextWrapping="Wrap"
+                               Text="Hole positions snap to the 25-unit graph grid while dragging." />
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <Border Margin="6,12,6,12" Background="White" BorderBrush="#DFE5ED"
+                BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Padding="14,10" BorderBrush="#E7EBF1" BorderThickness="0,0,0,1">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Right" Foreground="#7A8798" VerticalAlignment="Center"
+                                   Text="C: connect start to end  •  Click chain to select; Ctrl+click segment to select individually  •  Drag empty canvas: select holes  •  Ctrl+C, click, Ctrl+V: paste  •  Drag selected hole: move group  •  Wheel: zoom  •  Middle-drag: pan" />
+                        <TextBlock FontWeight="SemiBold" Foreground="#33435A" Text="Blast Layout Canvas" />
+                    </DockPanel>
+                </Border>
+
+                <ScrollViewer x:Name="CanvasScrollViewer"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              CanContentScroll="False"
+                              Background="#FAFBFD"
+                              Loaded="CanvasScrollViewer_Loaded"
+                              PreviewMouseWheel="Canvas_PreviewMouseWheel"
+                              PreviewMouseDown="Canvas_PreviewMouseDown"
+                              PreviewMouseMove="Canvas_PreviewMouseMove"
+                              PreviewMouseUp="Canvas_PreviewMouseUp">
+                    <Canvas x:Name="BlastCanvas"
+                            Focusable="True"
+                            Width="{Binding CanvasWidth}"
+                            Height="{Binding CanvasHeight}"
+                            ClipToBounds="True">
+                        <Canvas.Style>
+                            <Style TargetType="Canvas">
+                                <Setter Property="Background" Value="#FAFBFD" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGridVisible}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource GraphPaperBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Canvas.Style>
+                        <Canvas.LayoutTransform>
+                            <ScaleTransform ScaleX="{Binding ZoomScale}" ScaleY="{Binding ZoomScale}" />
+                        </Canvas.LayoutTransform>
+
+                        <ItemsControl Width="{Binding CanvasWidth}"
+                                      Height="{Binding CanvasHeight}"
+                                      ItemsSource="{Binding Connectors}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding Left}" />
+                                    <Setter Property="Canvas.Top" Value="{Binding Top}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:BlastConnector}">
+                                    <Path Data="{Binding ArrowGeometry}"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Cursor="Hand"
+                                          MouseLeftButtonDown="Connector_MouseLeftButtonDown">
+                                        <Path.Style>
+                                            <Style TargetType="Path">
+                                                <Setter Property="Stroke" Value="{Binding Color, Converter={StaticResource HexColorToBrushConverter}}" />
+                                                <Setter Property="StrokeThickness" Value="2" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="StrokeThickness" Value="4" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                    </Path>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ItemsControl Width="{Binding CanvasWidth}"
+                                      Height="{Binding CanvasHeight}"
+                                      ItemsSource="{Binding Holes}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding XPosition}" />
+                                    <Setter Property="Canvas.Top" Value="{Binding YPosition}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:BlastHole}">
+                                    <Border
+                                            Background="Transparent"
+                                            Cursor="Hand"
+                                            MouseLeftButtonDown="Hole_MouseLeftButtonDown"
+                                            MouseMove="Hole_MouseMove"
+                                            MouseLeftButtonUp="Hole_MouseLeftButtonUp">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Ellipse Width="{x:Static models:BlastHole.MarkerDiameter}"
+                                                     Height="{x:Static models:BlastHole.MarkerDiameter}"
+                                                     VerticalAlignment="Center"
+                                                     StrokeThickness="2">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="#161B22" />
+                                                        <Setter Property="Stroke" Value="White" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                                <Setter Property="Fill" Value="#2472E8" />
+                                                                <Setter Property="Stroke" Value="#164FA8" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
+                                            <TextBlock Margin="5,0,0,0" VerticalAlignment="Center"
+                                                       FontWeight="SemiBold" Foreground="#26354A"
+                                                       Text="{Binding HoleId}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Canvas>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </DockPanel>
+</Window>
