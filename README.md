@@ -34,6 +34,10 @@ dotnet run --project ".\Blasting Layout\Blasting Layout.csproj"
 
 Alternatively, open `Blasting Layout\Blasting Layout.csproj` in Visual Studio and run the project.
 
+## Prebuilt application
+
+A prebuilt Windows executable is included in [`Blasting Layout/bin/Debug/net8.0-windows/`](./Blasting%20Layout/bin/Debug/net8.0-windows/). Run `Blasting Layout.exe` from that folder. The executable is framework-dependent and requires the .NET 8 Windows Desktop Runtime. For the latest source or a different build configuration, build the project using the commands above.
+
 ## Basic use
 
 1. Choose a pattern, stagger direction, and row insertion direction in the **Toolbox**.
